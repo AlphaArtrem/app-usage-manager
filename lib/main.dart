@@ -1,3 +1,4 @@
+import 'package:appusagemanager/screens/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,6 +13,10 @@ class AppUsageManager extends StatefulWidget {
 class _AppUsageManagerState extends State<AppUsageManager> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return MaterialApp(
+      title: 'App Usage Manager',
+      debugShowCheckedModeBanner: false,
+      home: Home(),
+    );
   }
 }
