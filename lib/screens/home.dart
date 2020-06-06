@@ -1,3 +1,4 @@
+import 'package:appusagemanager/classes/database.dart';
 import 'package:appusagemanager/widgets/apps_used.dart';
 import 'package:appusagemanager/widgets/track_apps.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List _installedApps = [];
-  Map<String, double> _appUsage;
   int _selectedIndex = 0;
 
   Map _screens = {
@@ -28,8 +27,17 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_screens.keys.toList()[_selectedIndex]),
+        title: Text(_screens.keys.toList()[_selectedIndex], style: TextStyle(color: Colors.black),),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        actions: <Widget>[
+          _selectedIndex == 1 ? IconButton(
+            icon: Icon(Icons.add, color: Colors.black54,),
+            onPressed: () async {
+              dynamic result = await Navigator.pushNamed(context, 'addAppToTrack');
+            },
+          ) : Container(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

@@ -64,4 +64,10 @@ class TrackedAppsDatabase {
     Database db = await instance.database;
     return await db.delete(table, where: '$columnId = ?', whereArgs: [id]);
   }
+
+  // Get row count
+  Future<int> getRowCount() async {
+    Database db = await instance.database;
+    return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
+  }
 }

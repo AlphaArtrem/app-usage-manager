@@ -17,7 +17,6 @@ class _AppsUsedTodayState extends State<AppsUsedToday> {
     await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
       setState(() {
         _installedApps = apps;
-        print(_installedApps);
       });
     });
 
