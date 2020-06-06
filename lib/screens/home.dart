@@ -1,7 +1,5 @@
-import 'package:app_usage/app_usage.dart';
-import 'package:appusagemanager/classes/apps_used.dart';
-import 'package:appusagemanager/common/formatting.dart';
-import 'package:device_apps/device_apps.dart';
+import 'package:appusagemanager/widgets/apps_used.dart';
+import 'package:appusagemanager/widgets/track_apps.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -14,7 +12,10 @@ class _HomeState extends State<Home> {
   Map<String, double> _appUsage;
   int _selectedIndex = 0;
 
-  List _titles = ['Apps Used Today', 'Tracked Apps'];
+  Map _screens = {
+    'Apps Used Today' : AppsUsedToday(),
+    'Tracked Apps' : TrackApps(),
+  };
 
   void _onItemTapped(int index) {
     setState(() {
@@ -27,7 +28,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
+        title: Text(_screens.keys.toList()[_selectedIndex]),
         centerTitle: true,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -45,7 +46,7 @@ class _HomeState extends State<Home> {
         selectedItemColor: Colors.purpleAccent,
         onTap: _onItemTapped,
       ),
-      body: AppsUsedToday()
+      body: _screens[_screens.keys.toList()[_selectedIndex]],
     );
   }
 
