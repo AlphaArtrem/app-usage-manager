@@ -1,4 +1,3 @@
-import 'package:appusagemanager/classes/database.dart';
 import 'package:appusagemanager/widgets/apps_used.dart';
 import 'package:appusagemanager/widgets/track_apps.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _HomeState extends State<Home> {
           _selectedIndex == 1 ? IconButton(
             icon: Icon(Icons.add, color: Colors.black54,),
             onPressed: () async {
-              dynamic result = await Navigator.pushNamed(context, 'addAppToTrack');
+              await Navigator.pushNamed(context, 'addAppToTrack');
             },
           ) : Container(),
         ],

@@ -82,7 +82,12 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
                 padding: EdgeInsets.all(6.5),
                 child: Row(
                   children: <Widget>[
-                    BackButton(color: Colors.grey[700],),
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
+                    ),
                     Expanded(
                       child: TextFormField(
                         decoration: InputDecoration(
@@ -92,9 +97,11 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
                           hintText: "Search By App",
                         ),
                         onChanged: (val){
-                          setState(() {
-                            _unTrackedAppsVisible = _unTrackedApps.where((app) => app.appName.toString().toLowerCase().startsWith(val.toLowerCase()));
-                          });
+                          if(_unTrackedAppsVisible.isNotEmpty){
+                            setState(() {
+                              _unTrackedAppsVisible = _unTrackedApps..removeWhere((app) => !app.appName.toString().toLowerCase().startsWith(val.toLowerCase()));
+                            });
+                          }
                         },
                       ),
                     ),
@@ -125,14 +132,16 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
                               TrackedAppsDatabase.columnTime : maxTime,
                               TrackedAppsDatabase.columnPackage : _unTrackedAppsVisible[index].packageName,
                             });
+                            if(result != null){
+                              setState(() {
+                                _unTrackedApps.removeWhere((app) => app.packageName ==  _unTrackedAppsVisible[index].packageName);
+                                _unTrackedAppsVisible.removeWhere((app) => app.packageName ==  _unTrackedAppsVisible[index].packageName);
+                              });
+                            }
                           },
                           currentTime: DateTime.now(),
                           locale: LocaleType.en,
                         );
-
-                        if(result != null){
-                          Navigator.pop(context, result);
-                        }
                       },
                       title: Row(
                         children: <Widget>[
