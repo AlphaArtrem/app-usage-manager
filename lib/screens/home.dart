@@ -32,8 +32,8 @@ class _HomeState extends State<Home> {
         actions: <Widget>[
           _selectedIndex == 1 ? IconButton(
             icon: Icon(Icons.add, color: Colors.black54,),
-            onPressed: () async {
-              await Navigator.pushNamed(context, 'addAppToTrack');
+            onPressed: () {
+              Navigator.pushNamed(context, 'addAppToTrack');
             },
           ) : Container(),
         ],

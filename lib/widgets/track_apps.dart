@@ -14,6 +14,7 @@ class _TrackAppsState extends State<TrackApps> {
   final _database = TrackedAppsDatabase.instance;
   int _rowCount;
   List<Map<String, dynamic>> _trackedAppsData;
+  Map<String, double> _trackedAppsTime = {};
   List _trackedApps = [];
   Map<String, double> _appUsage;
 
@@ -21,6 +22,11 @@ class _TrackAppsState extends State<TrackApps> {
     _rowCount = await _database.getRowCount();
     if(_rowCount > 0){
       _trackedAppsData = await _database.getAllRows();
+
+      for(int i = 0 ; i < _trackedAppsData.length; i++){
+        _trackedAppsTime[_trackedAppsData[i][TrackedAppsDatabase.columnPackage]] = _trackedAppsData[i][TrackedAppsDatabase.columnTime];
+      }
+
       await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
         setState(() {
           _trackedApps = apps;
@@ -85,7 +91,14 @@ class _TrackAppsState extends State<TrackApps> {
                       ),
                       Expanded(
                         flex: 3,
-                        child: Text('${formatTime(_appUsage[_trackedApps[index].packageName])}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),),
+                        child: Text(
+                          '${formatTime(_appUsage[_trackedApps[index].packageName])}',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              color: _trackedAppsTime[_trackedApps[index].packageName] >= _appUsage[_trackedApps[index].packageName] ? Colors.green : Colors.red,
+                          ),
+                        ),
                       ),
                     ],
                   ),
