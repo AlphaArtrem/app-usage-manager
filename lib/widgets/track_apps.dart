@@ -28,9 +28,7 @@ class _TrackAppsState extends State<TrackApps> {
       }
 
       await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
-        setState(() {
-          _trackedApps = apps;
-        });
+        _trackedApps = apps;
       });
 
       AppUsage appUsage = new AppUsage();
