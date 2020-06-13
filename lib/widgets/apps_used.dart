@@ -1,11 +1,101 @@
 import 'package:app_usage/app_usage.dart';
+import 'package:appusagemanager/classes/database.dart';
 import 'package:appusagemanager/common/formatting.dart';
 import 'package:appusagemanager/common/functions.dart';
-import 'package:appusagemanager/screens/home.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:workmanager/workmanager.dart';
+
+Future selectNotification(String payload) async {
+}
+
+Future onDidReceiveLocalNotification(int id, String title, String body, String payload) async {
+}
+
+void backgroundFetch(){
+  Workmanager.executeTask((task, inputData) async{
+    final _database = TrackedAppsDatabase.instance;
+    int _rowCount = 0;
+    List<Map<String, dynamic>> _trackedAppsData;
+    Map<String, double> _trackedAppsTime = {};
+    List _trackedApps = [];
+    Map<String, double> _appUsage;
+
+    _rowCount = await _database.getRowCount();
+    print(_rowCount);
+    if(_rowCount > 0){
+      _trackedAppsData = await _database.getAllRows();
+
+      for(int i = 0 ; i < _trackedAppsData.length; i++){
+        _trackedAppsTime[_trackedAppsData[i][TrackedAppsDatabase.columnPackage]] = _trackedAppsData[i][TrackedAppsDatabase.columnTime];
+      }
+
+      await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
+        _trackedApps = apps;
+      });
+
+      AppUsage appUsage = new AppUsage();
+      try {
+        // Define a time interval
+        DateTime endDate = new DateTime.now();
+        DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day, 0, 0, 0);
+
+        // Fetch the usage stats
+        Map<String, double> usage = await appUsage.fetchUsage(startDate, endDate);
+
+        _appUsage = usage;
+        _trackedApps = _trackedApps.where((app) => _appUsage.keys.toList().contains(app.packageName)).toList();
+
+        List<String> trackedAppsPackages = [];
+
+        for(int i = 0 ; i < _trackedAppsData.length; i++){
+          trackedAppsPackages.add(_trackedAppsData[i][TrackedAppsDatabase.columnPackage]);
+        }
+        _trackedApps = _trackedApps.where((app) => trackedAppsPackages.contains(app.packageName.toString())).toList();
+
+      }
+      on AppUsageException catch (exception) {
+        print(exception);
+      }
+
+      WidgetsFlutterBinding.ensureInitialized();
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+      var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+      var initializationSettingsIOS = IOSInitializationSettings(
+          onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+      var initializationSettings = InitializationSettings(
+          initializationSettingsAndroid, initializationSettingsIOS);
+      await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+          onSelectNotification: selectNotification);
+
+      var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+          'AppUsage', 'AppUsageNotification', 'AppUsageExceededNotification',
+          importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+      var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+      var platformChannelSpecifics = NotificationDetails(
+          androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+
+      for(int i = 0; i < _trackedApps.length; i++){
+        if( _trackedAppsTime[_trackedApps[i].packageName] <= _appUsage[_trackedApps[i].packageName]){
+            String title = 'Overused ${_trackedApps[i].appName.toString()}';
+            String body = 'Exceded Usage Of ${_trackedApps[i].appName.toString()} by '
+                '${formatTime(_appUsage[_appUsage[_trackedApps[i].packageName] -  _trackedAppsTime[_trackedApps[i].packageName]])}';
+          await flutterLocalNotificationsPlugin.show(
+            0,
+            title.toString(),
+            body.toString(),
+            platformChannelSpecifics,
+          );
+        }
+      }
+    }
+
+    return Future.value(true);
+  });
+}
 
 class AppsUsedToday extends StatefulWidget {
   @override
@@ -17,8 +107,6 @@ class _AppsUsedTodayState extends State<AppsUsedToday> {
   Map<String, double> _appUsage;
 
   void setup() async{
-    await notificationSetup();
-
     await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
       _installedApps = apps;
     });
@@ -41,6 +129,12 @@ class _AppsUsedTodayState extends State<AppsUsedToday> {
     on AppUsageException catch (exception) {
       print(exception);
     }
+
+    /*Workmanager.initialize(
+        backgroundFetch, // The top level function
+        //isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+    );
+    Workmanager.registerPeriodicTask("1", "fetchBackgroundData", frequency: Duration(minutes: 15));*/
   }
 
   @override
@@ -82,60 +176,6 @@ class _AppsUsedTodayState extends State<AppsUsedToday> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Future notificationSetup() async {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-    var initializationSettingsIOS = IOSInitializationSettings(
-        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
-    var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: selectNotification);
-
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'AppUsage', 'AppUsageNotification', 'AppUsageExceededNotification',
-        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Overused X App',
-      'You have exceeded the usage of App X by Y time',
-      platformChannelSpecifics,
-    );
-  }
-
-  Future selectNotification(String payload) async {
-    await Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Home()),
-    );
-  }
-
-  Future onDidReceiveLocalNotification(int id, String title, String body, String payload) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title),
-        content: Text(body),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            child: Text('Ok'),
-            onPressed: () async {
-              Navigator.of(context, rootNavigator: true).pop();
-              await Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Home(),),
-              );
-            },
-          )
-        ],
       ),
     );
   }

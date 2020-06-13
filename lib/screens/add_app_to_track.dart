@@ -97,9 +97,9 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
                           hintText: "Search By App",
                         ),
                         onChanged: (val){
-                          if(_unTrackedAppsVisible.isNotEmpty){
+                          if(_unTrackedApps.isNotEmpty){
                             setState(() {
-                              _unTrackedAppsVisible = _unTrackedApps..removeWhere((app) => !app.appName.toString().toLowerCase().startsWith(val.toLowerCase()));
+                              _unTrackedAppsVisible = _unTrackedApps.where((app) => app.appName.toString().toLowerCase().startsWith(val.toLowerCase())).toList();
                             });
                           }
                         },
@@ -110,7 +110,7 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
               ),
             ),
             Expanded(
-              child: _unTrackedAppsVisible.length == 0 ? Center(child: loader,) : ListView.builder(
+              child: _unTrackedApps.length == 0 ? Center(child: loader,) : ListView.builder(
                 itemCount: _unTrackedAppsVisible.length,
                 itemBuilder: (context, index){
                   return Card(

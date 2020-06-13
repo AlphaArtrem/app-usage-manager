@@ -29,15 +29,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.1"
-  background_fetch:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "97e1e6eb064fe6c6dc51ff329928b9a938204f5c"
-      url: "https://github.com/transistorsoft/flutter_background_fetch"
-    source: git
-    version: "0.5.6"
   boolean_selector:
     dependency: transitive
     description:
@@ -248,7 +239,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.0+2"
+    version: "1.3.1"
   sqflite_common:
     dependency: transitive
     description:
