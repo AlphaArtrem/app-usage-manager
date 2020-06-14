@@ -83,19 +83,27 @@ class _TrackAppsState extends State<TrackApps> {
                         flex: 2,
                         child: Image.memory(_trackedApps[index].icon, scale: 8,),
                       ),
+                      SizedBox(width: 5,),
                       Expanded(
-                          flex: 8,
+                          flex: 6,
                           child: Text('${_trackedApps[index].appName.toString()}',)
                       ),
                       Expanded(
-                        flex: 3,
-                        child: Text(
-                          '${formatTime(_appUsage[_trackedApps[index].packageName])}',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w300,
-                              color: _trackedAppsTime[_trackedApps[index].packageName] >= _appUsage[_trackedApps[index].packageName] ? Colors.green : Colors.red,
-                          ),
+                        flex: 8,
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                                '${formatTime(_appUsage[_trackedApps[index].packageName])}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w300,
+                                  color: _trackedAppsTime[_trackedApps[index].packageName] <= _appUsage[_trackedApps[index].packageName] ? Colors.red : Colors.green,
+                              ),
+                            ),
+                            Text(
+                              " / ${formatTime(_trackedAppsTime[_trackedApps[index].packageName])}"
+                            ),
+                          ],
                         ),
                       ),
                     ],

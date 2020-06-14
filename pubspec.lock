@@ -29,6 +29,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.1"
+  background_fetch:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: e95d6a8b97234f8185c0619828fe0b54c6322c74
+      url: "https://github.com/transistorsoft/flutter_background_fetch"
+    source: git
+    version: "0.6.0"
   boolean_selector:
     dependency: transitive
     description:
