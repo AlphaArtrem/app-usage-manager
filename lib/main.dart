@@ -16,26 +16,27 @@ Future onDidReceiveLocalNotification(int id, String title, String body, String p
 }
 
 void backgroundFetch(String taskId) async{
+  WidgetsFlutterBinding.ensureInitialized();
   final _database = TrackedAppsDatabase.instance;
-  int _rowCount = 0;
+  int _rowCount = 1;
   List<Map<String, dynamic>> _trackedAppsData;
   Map<String, double> _trackedAppsTime = {};
   List _trackedApps = [];
   Map<String, double> _appUsage;
 
-  _rowCount = await _database.getRowCount();
+  //*_rowCount = await _database.getRowCount();
   if(_rowCount > 0){
-    _trackedAppsData = await _database.getAllRows();
+    /*_trackedAppsData = await _database.getAllRows();
 
     for(int i = 0 ; i < _trackedAppsData.length; i++){
       _trackedAppsTime[_trackedAppsData[i][TrackedAppsDatabase.columnPackage]] = _trackedAppsData[i][TrackedAppsDatabase.columnTime];
-    }
+    }*/
 
     await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
       _trackedApps = apps;
     });
 
-    AppUsage appUsage = new AppUsage();
+    /*AppUsage appUsage = new AppUsage();
     try {
       // Define a time interval
       DateTime endDate = new DateTime.now();
@@ -44,22 +45,21 @@ void backgroundFetch(String taskId) async{
       // Fetch the usage stats
       Map<String, double> usage = await appUsage.fetchUsage(startDate, endDate);
 
-      _appUsage = usage;
+      /*_appUsage = usage;
       _trackedApps = _trackedApps.where((app) => _appUsage.keys.toList().contains(app.packageName)).toList();
 
       List<String> trackedAppsPackages = [];
 
       for(int i = 0 ; i < _trackedAppsData.length; i++){
         trackedAppsPackages.add(_trackedAppsData[i][TrackedAppsDatabase.columnPackage]);
-      }
-      _trackedApps = _trackedApps.where((app) => trackedAppsPackages.contains(app.packageName.toString())).toList();
+      }*/
+     // _trackedApps = _trackedApps.where((app) => trackedAppsPackages.contains(app.packageName.toString())).toList();
 
     }
     on AppUsageException catch (exception) {
       print(exception);
-    }
+    }*/
 
-    WidgetsFlutterBinding.ensureInitialized();
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = IOSInitializationSettings(
@@ -76,8 +76,15 @@ void backgroundFetch(String taskId) async{
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
+    await flutterLocalNotificationsPlugin.show(
+      0,
+     'ABC',
+      'DEF',
+      platformChannelSpecifics,
+    );
 
-    for(int i = 0; i < _trackedApps.length; i++){
+
+    /*for(int i = 0; i < _trackedApps.length; i++){
       if( _trackedAppsTime[_trackedApps[i].packageName] <= _appUsage[_trackedApps[i].packageName]){
         double exceededBy = _appUsage[_trackedApps[i].packageName] -  _trackedAppsTime[_trackedApps[i].packageName];
         String title = 'Overused ${_trackedApps[i].appName.toString()}';
@@ -89,7 +96,7 @@ void backgroundFetch(String taskId) async{
           platformChannelSpecifics,
         );
       }
-    }
+    }*/
   }
 
   BackgroundFetch.finish(taskId);

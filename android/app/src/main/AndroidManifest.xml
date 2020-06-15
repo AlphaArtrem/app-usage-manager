@@ -8,9 +8,10 @@
          FlutterApplication and put your custom class here. -->
     <application
         tools:replace="android:label"
-        android:name="io.flutter.app.FlutterApplication"
+        android:name=".MyApplication"
         android:label="appusagemanager"
         android:icon="@mipmap/ic_launcher">
+        <service android:name=".MyService" android:exported="true" android:enabled="true"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -49,6 +50,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions"/>
