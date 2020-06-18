@@ -4,6 +4,7 @@ import 'package:appusagemanager/common/formatting.dart';
 import 'package:appusagemanager/common/functions.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TrackApps extends StatefulWidget {
   @override
@@ -11,20 +12,29 @@ class TrackApps extends StatefulWidget {
 }
 
 class _TrackAppsState extends State<TrackApps> {
-  final _database = TrackedAppsDatabase.instance;
+  SharedPreferences _sharedPreferences;
   int _rowCount;
-  List<Map<String, dynamic>> _trackedAppsData;
-  Map<String, double> _trackedAppsTime = {};
+  List<Map<String, dynamic>> _trackedAppsData = [];
+  Map<String, int> _trackedAppsTime = {};
   List _trackedApps = [];
   Map<String, double> _appUsage;
 
   void setup() async{
-    _rowCount = await _database.getRowCount();
+    _sharedPreferences = await SharedPreferences.getInstance();
+    List<String> trackedPackagesKeys = _sharedPreferences.getKeys().toList();
+    _rowCount = trackedPackagesKeys.length;
+
     if(_rowCount > 0){
-      _trackedAppsData = await _database.getAllRows();
+      for(int i = 0; i < _rowCount; i++){
+        int time = _sharedPreferences.getInt(trackedPackagesKeys[i]);
+        _trackedAppsData.add({
+          'package' : trackedPackagesKeys[i],
+          'time' : time,
+        });
+      }
 
       for(int i = 0 ; i < _trackedAppsData.length; i++){
-        _trackedAppsTime[_trackedAppsData[i][TrackedAppsDatabase.columnPackage]] = _trackedAppsData[i][TrackedAppsDatabase.columnTime];
+        _trackedAppsTime[_trackedAppsData[i]['package']] = _trackedAppsData[i]['time'];
       }
 
       await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
@@ -46,7 +56,7 @@ class _TrackAppsState extends State<TrackApps> {
         List<String> trackedAppsPackages = [];
 
         for(int i = 0 ; i < _trackedAppsData.length; i++){
-          trackedAppsPackages.add(_trackedAppsData[i][TrackedAppsDatabase.columnPackage]);
+          trackedAppsPackages.add(_trackedAppsData[i]['package']);
         }
         _trackedApps = _trackedApps.where((app) => trackedAppsPackages.contains(app.packageName.toString())).toList();
 
@@ -55,7 +65,6 @@ class _TrackAppsState extends State<TrackApps> {
         print(exception);
       }
     }
-
     setState(() {});
   }
 
@@ -101,7 +110,7 @@ class _TrackAppsState extends State<TrackApps> {
                               ),
                             ),
                             Text(
-                              " / ${formatTime(_trackedAppsTime[_trackedApps[index].packageName])}"
+                              " / ${formatTime(_trackedAppsTime[_trackedApps[index].packageName].toDouble())}"
                             ),
                           ],
                         ),

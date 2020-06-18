@@ -1,10 +1,10 @@
 import 'package:app_usage/app_usage.dart';
-import 'package:appusagemanager/classes/database.dart';
 import 'package:appusagemanager/common/formatting.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddAppToTrack extends StatefulWidget {
   @override
@@ -12,12 +12,13 @@ class AddAppToTrack extends StatefulWidget {
 }
 
 class _AddAppToTrackState extends State<AddAppToTrack> {
+  SharedPreferences _sharedPreferences;
   List _unTrackedApps = [];
   List _unTrackedAppsVisible = [];
   Map<String, double> _appUsage;
-  final _database = TrackedAppsDatabase.instance;
 
   void setup() async{
+    _sharedPreferences = await SharedPreferences.getInstance();
     await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
       setState(() {
         _unTrackedApps = apps;
@@ -38,13 +39,8 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
     on AppUsageException catch (exception) {
       print(exception);
     }
-    
-    List<Map<String, dynamic>> trackedApps = await _database.getAllRows();
-    List<String> trackedAppsPackages = [];
 
-    for(int i = 0 ; i < trackedApps.length; i++){
-      trackedAppsPackages.add(trackedApps[i][TrackedAppsDatabase.columnPackage]);
-    }
+    List<String> trackedAppsPackages =_sharedPreferences.getKeys().toList();
     
     setState(() {
       _unTrackedApps = _unTrackedApps.where((app) => !trackedAppsPackages.contains(app.packageName.toString())).toList();
@@ -128,18 +124,15 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
                           showTitleActions: true,
                           onConfirm: (time) async{
                             maxTime = (time.hour * 60 * 60) + (time.minute * 60);
-                            result = await _database.addEntry({
-                              TrackedAppsDatabase.columnTime : maxTime,
-                              TrackedAppsDatabase.columnPackage : _unTrackedAppsVisible[index].packageName,
-                            });
-                            if(result != null){
+                            _sharedPreferences.setInt(_unTrackedAppsVisible[index].packageName, maxTime);
+                            if(_sharedPreferences.containsKey(_unTrackedAppsVisible[index].packageName)){
                               setState(() {
                                 _unTrackedApps.removeWhere((app) => app.packageName ==  _unTrackedAppsVisible[index].packageName);
                                 _unTrackedAppsVisible.removeWhere((app) => app.packageName ==  _unTrackedAppsVisible[index].packageName);
                               });
                             }
                           },
-                          currentTime: DateTime.now(),
+                          currentTime: DateTime.utc(0),
                           locale: LocaleType.en,
                         );
                       },

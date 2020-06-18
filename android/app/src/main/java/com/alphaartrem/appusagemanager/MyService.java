@@ -16,8 +16,9 @@ public class MyService extends Service {
         super.onCreate();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            String text= "This is running in Background";
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this,"messages")
-                    .setContentText("This is running in Background")
+                    .setContentText(text)
                     .setContentTitle("Flutter Background")
                     .setSmallIcon(R.drawable.app_icon);
 

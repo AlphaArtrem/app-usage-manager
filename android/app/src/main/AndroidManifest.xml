@@ -9,7 +9,7 @@
     <application
         tools:replace="android:label"
         android:name=".MyApplication"
-        android:label="appusagemanager"
+        android:label="App Usage Manager"
         android:icon="@mipmap/ic_launcher">
         <service android:name=".MyService" android:exported="true" android:enabled="true"/>
         <activity
