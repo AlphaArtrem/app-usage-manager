@@ -113,8 +113,7 @@ class _AddAppToTrackState extends State<AddAppToTrack> {
                     elevation: 1,
                     child: ListTile(
                       onTap: (){
-                        int maxTime;
-                        dynamic result;
+                        int maxTime;  
                         DatePicker.showTimePicker(
                           context,
                           theme: DatePickerTheme(

@@ -20,7 +20,7 @@ public class MainActivity extends FlutterActivity {
 
         }
 
-        forService = new Intent(MainActivity.this,MyService.class);
+        forService = new Intent(MainActivity.this, MyService.class);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             startForegroundService(forService);
         } else {

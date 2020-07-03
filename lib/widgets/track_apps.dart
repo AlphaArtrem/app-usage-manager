@@ -1,5 +1,4 @@
 import 'package:app_usage/app_usage.dart';
-import 'package:appusagemanager/classes/database.dart';
 import 'package:appusagemanager/common/formatting.dart';
 import 'package:appusagemanager/common/functions.dart';
 import 'package:device_apps/device_apps.dart';
@@ -13,7 +12,7 @@ class TrackApps extends StatefulWidget {
 
 class _TrackAppsState extends State<TrackApps> {
   SharedPreferences _sharedPreferences;
-  int _rowCount;
+  int _trackedAppsCount;
   List<Map<String, dynamic>> _trackedAppsData = [];
   Map<String, int> _trackedAppsTime = {};
   List _trackedApps = [];
@@ -22,10 +21,10 @@ class _TrackAppsState extends State<TrackApps> {
   void setup() async{
     _sharedPreferences = await SharedPreferences.getInstance();
     List<String> trackedPackagesKeys = _sharedPreferences.getKeys().toList();
-    _rowCount = trackedPackagesKeys.length;
+    _trackedAppsCount = trackedPackagesKeys.length;
 
-    if(_rowCount > 0){
-      for(int i = 0; i < _rowCount; i++){
+    if(_trackedAppsCount > 0){
+      for(int i = 0; i < _trackedAppsCount; i++){
         int time = _sharedPreferences.getInt(trackedPackagesKeys[i]);
         _trackedAppsData.add({
           'package' : trackedPackagesKeys[i],
@@ -77,9 +76,9 @@ class _TrackAppsState extends State<TrackApps> {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: _rowCount == null ? loader : Padding(
+        child: _trackedAppsCount == null ? loader : Padding(
           padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
-          child: _rowCount == 0 ? Text("You are not tracking any app usage.") : ListView.builder(
+          child: _trackedAppsCount == 0 ? Text("You are not tracking any app usage.") : ListView.builder(
             itemCount: _trackedApps.length,
             itemBuilder: (context, index){
               return Card(
