@@ -1,15 +1,31 @@
-import 'dart:html';
-
 import 'package:appusagemanager/screens/add_app_to_track.dart';
 import 'package:appusagemanager/screens/home.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void backgroundFetchHeadlessTask(String taskId) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List keys = prefs.getKeys().toList();
+
+  // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+  var initializationSettingsIOS = IOSInitializationSettings(onDidReceiveLocalNotification: (int id, String title, String body, String payload) async {});
+  var initializationSettings = InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: (String payload) async{});
+
+  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your channel id', 'your channel name', 'your channel description',
+      importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+  var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+  var platformChannelSpecifics = NotificationDetails(
+      androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+      0, 'Apps Tracked', '${keys.length > 0 ? keys : 'No Apps Tracked'}', platformChannelSpecifics,
+      payload: 'item x');
 
   BackgroundFetch.finish(taskId);
 }
