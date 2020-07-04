@@ -18,14 +18,14 @@ void backgroundFetchHeadlessTask(String taskId) async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: (String payload) async{});
 
   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'your channel id', 'your channel name', 'your channel description',
+      'staticAlert', 'checkUsgae', 'Static alert to check app usage',
       importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
   var platformChannelSpecifics = NotificationDetails(
       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
   await flutterLocalNotificationsPlugin.show(
-      0, 'Apps Tracked', '${keys.length > 0 ? keys : 'No Apps Tracked'}', platformChannelSpecifics,
-      payload: 'item x');
+      0, 'Check Usgae', 'Track your app usage details', platformChannelSpecifics,
+      payload: null);
 
   BackgroundFetch.finish(taskId);
 }
@@ -74,7 +74,6 @@ class _AppUsageManagerState extends State<AppUsageManager> {
         requiresDeviceIdle: false,
         requiredNetworkType: NetworkType.NONE
     ), (String taskId) async {
-      backgroundFetchHeadlessTask(taskId);
     });
 
     // If the widget was removed from the tree while the asynchronous platform
