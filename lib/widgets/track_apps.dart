@@ -21,6 +21,7 @@ class _TrackAppsState extends State<TrackApps> {
   void setup() async{
     _sharedPreferences = await SharedPreferences.getInstance();
     List<String> trackedPackagesKeys = _sharedPreferences.getKeys().toList();
+    print(trackedPackagesKeys);
     _trackedAppsCount = trackedPackagesKeys.length;
 
     if(_trackedAppsCount > 0){

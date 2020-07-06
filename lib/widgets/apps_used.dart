@@ -4,6 +4,7 @@ import 'package:appusagemanager/common/functions.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppsUsedToday extends StatefulWidget {
   @override
@@ -13,8 +14,10 @@ class AppsUsedToday extends StatefulWidget {
 class _AppsUsedTodayState extends State<AppsUsedToday> {
   List _installedApps = [];
   Map<String, double> _appUsage;
+  static const platform = const MethodChannel('com.alphaartrem.appusagemanager/notification');
 
   void setup() async{
+    await platform.invokeMethod('showNotification');
     await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
       _installedApps = apps;
     });
