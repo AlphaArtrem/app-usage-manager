@@ -14,10 +14,10 @@ class AppsUsedToday extends StatefulWidget {
 class _AppsUsedTodayState extends State<AppsUsedToday> {
   List _installedApps = [];
   Map<String, double> _appUsage;
-  static const platform = const MethodChannel('com.alphaartrem.appusagemanager/notification');
+  //static const platform = const MethodChannel('com.alphaartrem.appusagemanager/notification');
 
   void setup() async{
-    await platform.invokeMethod('showNotification');
+    //await platform.invokeMethod('showNotification');
     await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeAppIcons: true).then((apps) {
       _installedApps = apps;
     });
