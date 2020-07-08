@@ -2,53 +2,29 @@ package com.alphaartrem.appusagemanager;
 
 import io.flutter.embedding.android.FlutterActivity;
 
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import androidx.annotation.NonNull;
-import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.plugin.common.MethodChannel;
-
 public class MainActivity extends FlutterActivity {
-    private static final String CHANNEL = "com.alphaartrem.appusagemanager/notification";
+    private PendingIntent pendingIntent;
+    private AlarmManager manager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        Intent alarmIntent = new Intent(this, BackgroundService.class);
+        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        startAlarm();
     }
 
-    @Override
-    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
-        super.configureFlutterEngine(flutterEngine);
-        /*new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
-                .setMethodCallHandler(
-                        (call, result) -> {
-                            // Note: this method is invoked on the main thread.
-                            if (call.method.equals("showNotification")) {
-                                try{
-                                    result.success("Notification Shown");
-                                }
-                                catch (Exception e){
-                                    result.error("UNAVAILABLE", e.toString() , null);
-                                }
-                            } else {
-                                result.notImplemented();
-                            }
-                        }
-                );*/
+    public void startAlarm() {
+        manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        int interval = 100000;
+
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
     }
 }

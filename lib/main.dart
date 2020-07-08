@@ -4,12 +4,8 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void backgroundFetchHeadlessTask(String taskId) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List keys = prefs.getKeys().toList();
-
   // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
@@ -18,13 +14,13 @@ void backgroundFetchHeadlessTask(String taskId) async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: (String payload) async{});
 
   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'staticAlert', 'checkUsgae', 'Static alert to check app usage',
+      'staticAlert', 'Check Usage Remainder', 'Static alert to check app usage',
       importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
   var platformChannelSpecifics = NotificationDetails(
       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
   await flutterLocalNotificationsPlugin.show(
-      0, 'Check Usgae', 'Track your app usage details', platformChannelSpecifics,
+      0, 'Check Usage', 'Track your app usage details', platformChannelSpecifics,
       payload: null);
 
   BackgroundFetch.finish(taskId);

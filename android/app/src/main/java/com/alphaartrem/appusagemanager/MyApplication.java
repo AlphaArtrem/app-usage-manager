@@ -14,7 +14,7 @@ public class MyApplication extends FlutterApplication {
         super.onCreate();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("messages","Messages", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel("messages","Overuse Alert", NotificationManager.IMPORTANCE_LOW);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
